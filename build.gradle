@@ -11,7 +11,7 @@ buildscript {
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
-    ext{
+    ext {
         applicationId = 'com.stashinvest.stashchallenge'
         // Sdk and tools
         compileSdkVersion = 28
@@ -22,6 +22,11 @@ buildscript {
         supportLibVersion = '1.0.2'
         materialLibVersion = '1.1.0-alpha01'
         recyclerViewLibVersion = '1.0.0-alpha1'
+        butterKnifeLibVersion = '9.0.0-rc2'
+        daggerLibVersion = '2.13'
+        picassoLibVersion = '2.5.2'
+        rxAndroidVersion = '2.1.0'
+        rxJavaVersion = '2.2.3'
     }
 }
 
