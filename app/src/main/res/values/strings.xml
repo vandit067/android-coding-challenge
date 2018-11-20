@@ -7,4 +7,6 @@
 
     <string name="search_hint">Search Phrase</string>
     <string name="metadata_title_format">%1$s by %2$s</string>
+    <string name="message_no_data_available">No data available</string>
+    <string name="message_enter_search_text">Please enter search text</string>
 </resources>

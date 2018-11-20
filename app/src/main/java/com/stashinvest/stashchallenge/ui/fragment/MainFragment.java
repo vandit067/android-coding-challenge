@@ -1,58 +1,54 @@
 package com.stashinvest.stashchallenge.ui.fragment;
 
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.stashinvest.stashchallenge.App;
 import com.stashinvest.stashchallenge.R;
-import com.stashinvest.stashchallenge.api.GettyImageService;
-import com.stashinvest.stashchallenge.api.model.ImageResponse;
 import com.stashinvest.stashchallenge.api.model.ImageResult;
-import com.stashinvest.stashchallenge.ui.adapter.ViewModelAdapter;
-import com.stashinvest.stashchallenge.ui.factory.GettyImageFactory;
-import com.stashinvest.stashchallenge.ui.viewmodel.BaseViewModel;
+import com.stashinvest.stashchallenge.ui.contract.MainFragmentContract;
+import com.stashinvest.stashchallenge.ui.presenter.MainFragmentPresenterImpl;
 import com.stashinvest.stashchallenge.util.SpaceItemDecoration;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindDimen;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
-import static android.view.View.GONE;
+public class MainFragment extends Fragment implements MainFragmentContract.View, TextView.OnEditorActionListener {
 
-public class MainFragment extends Fragment implements Callback<ImageResponse> {
-    @Inject
-    ViewModelAdapter adapter;
-    @Inject
-    GettyImageService gettyImageService;
-    @Inject
-    GettyImageFactory gettyImageFactory;
-
+    @BindView(R.id.fragment_main_fl_main)
+    FrameLayout mFlMainView;
     @BindView(R.id.search_phrase)
     EditText searchView;
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
     @BindView(R.id.progress_bar)
-    ProgressBar progressBar;
+    ProgressBar mProgressBar;
     @BindDimen(R.dimen.image_space)
     int space;
+
+    @Inject
+    MainFragmentPresenterImpl mMainFragmentPresenter;
 
     Unbinder unbinder;
 
@@ -68,20 +64,12 @@ public class MainFragment extends Fragment implements Callback<ImageResponse> {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         unbinder = ButterKnife.bind(this, view);
-
-        searchView.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                search();
-                return true;
-            }
-            return false;
-        });
-
+        searchView.setOnEditorActionListener(this);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(mMainFragmentPresenter.getAdapter());
         recyclerView.addItemDecoration(new SpaceItemDecoration(space, space, space, space));
         return view;
     }
@@ -93,40 +81,46 @@ public class MainFragment extends Fragment implements Callback<ImageResponse> {
     }
 
     @Override
-    public void onResponse(Call<ImageResponse> call, Response<ImageResponse> response) {
-        progressBar.setVisibility(GONE);
-
-        if (response.isSuccessful()) {
-            List<ImageResult> images = response.body().getImages();
-            updateImages(images);
-        } else {
-            //todo - show error
-        }
+    public void showProgress() {
+        this.mProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void onFailure(Call<ImageResponse> call, Throwable t) {
-        progressBar.setVisibility(GONE);
-
-        //todo - show error
+    public void hideProgress() {
+        this.mProgressBar.setVisibility(View.GONE);
     }
 
-    private void search() {
-        progressBar.setVisibility(View.VISIBLE);
-        Call<ImageResponse> call = gettyImageService.searchImages(searchView.getText().toString());
-        call.enqueue(this);
+    @Override
+    public void showComplete() {
+
     }
 
-    private void updateImages(List<ImageResult> images) {
-        List<BaseViewModel> viewModels = new ArrayList<>();
-        int i = 0;
-        for (ImageResult imageResult : images) {
-            viewModels.add(gettyImageFactory.createGettyImageViewModel(i++, imageResult, this::onImageLongPress));
+    @Override
+    public void showError(@NonNull String message) {
+        this.hideProgress();
+        Snackbar.make(this.mFlMainView, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showData(@NonNull List<ImageResult> imagesList) {
+        this.hideProgress();
+        if(imagesList.isEmpty()){
+            Snackbar.make(this.mFlMainView, getString(R.string.message_no_data_available), Snackbar.LENGTH_SHORT).show();
+            return;
         }
-        adapter.setViewModels(viewModels);
+        this.mMainFragmentPresenter.updateImages(imagesList);
     }
 
-    public void onImageLongPress(String id, String uri) {
-        //todo - implement new feature
+    @Override
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+            if(TextUtils.isEmpty(v.getText())){
+                Snackbar.make(this.mFlMainView, getString(R.string.message_enter_search_text), Snackbar.LENGTH_SHORT).show();
+                return false;
+            }
+            mMainFragmentPresenter.loadData(v.getText().toString());
+            return true;
+        }
+        return false;
     }
 }
