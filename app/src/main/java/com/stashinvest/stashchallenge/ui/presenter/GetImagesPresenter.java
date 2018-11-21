@@ -2,10 +2,13 @@ package com.stashinvest.stashchallenge.ui.presenter;
 
 import com.stashinvest.stashchallenge.api.GettyImageService;
 import com.stashinvest.stashchallenge.api.model.ImageResult;
+import com.stashinvest.stashchallenge.injection.module.RxModule;
 import com.stashinvest.stashchallenge.ui.adapter.ViewModelAdapter;
-import com.stashinvest.stashchallenge.ui.contract.MainFragmentContract;
+import com.stashinvest.stashchallenge.ui.contract.GetImagesContract;
 import com.stashinvest.stashchallenge.ui.factory.GettyImageFactory;
 import com.stashinvest.stashchallenge.ui.viewmodel.BaseViewModel;
+import com.stashinvest.stashchallenge.util.rx.AppRxSchedulers;
+import com.stashinvest.stashchallenge.util.rx.RxSchedulers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +17,12 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
-public class MainFragmentPresenterImpl implements MainFragmentContract.Presenter {
-
-    MainFragmentContract.View mView;
+public class GetImagesPresenter extends BasePresenter<GetImagesContract.View> implements GetImagesContract.Presenter{
 
     @Inject
     GettyImageService mGettyImageService;
@@ -30,9 +33,12 @@ public class MainFragmentPresenterImpl implements MainFragmentContract.Presenter
     @Inject
     ViewModelAdapter mAdapter;
 
+    private final AppRxSchedulers appRxSchedulers;
+
     @Inject
-    public MainFragmentPresenterImpl(MainFragmentContract.View mView) {
-        this.mView = mView;
+    public GetImagesPresenter(GetImagesContract.View view) {
+        super(view);
+        appRxSchedulers = new AppRxSchedulers();
     }
 
     public ViewModelAdapter getAdapter() {
@@ -41,27 +47,17 @@ public class MainFragmentPresenterImpl implements MainFragmentContract.Presenter
 
     @Override
     public void loadData(@NonNull String searchText) {
-        this.mView.showProgress();
-        this.mGettyImageService.searchImages(searchText)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableObserver<List<ImageResult>>() {
-                    @Override
-                    public void onNext(List<ImageResult> imageResults) {
-                        mView.showData(imageResults);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mView.showError(e.getMessage());
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        mView.showComplete();
-                        mView.hideProgress();
-                    }
-                });
+        addDisposable(this.mGettyImageService.searchImages(searchText)
+                .subscribeOn(appRxSchedulers.io())
+                .observeOn(appRxSchedulers.androidThread())
+                .doOnSubscribe(disposable -> view.showProgress())
+                .subscribe(imageResponse -> {
+                    view.hideProgress();
+                    view.showData(imageResponse.getImages());
+                }, e -> {
+                    view.hideProgress();
+                    view.showError(e.getMessage());
+                }));
     }
 
     public void updateImages(@NonNull List<ImageResult> images) {

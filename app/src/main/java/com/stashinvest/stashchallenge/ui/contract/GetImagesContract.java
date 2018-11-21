@@ -6,7 +6,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 
-public interface MainFragmentContract {
+public interface GetImagesContract {
 
     interface View {
         void showProgress();

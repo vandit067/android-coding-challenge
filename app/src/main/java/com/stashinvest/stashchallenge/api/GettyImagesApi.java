@@ -7,7 +7,7 @@ import com.stashinvest.stashchallenge.api.model.MetadataResponse;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -17,9 +17,9 @@ public interface GettyImagesApi {
 
     @NonNull
     @GET("search/images")
-    Observable<List<ImageResult>> searchImages(@Query("phrase") String phrase,
-                                               @Query("fields") String fields,
-                                               @Query("sort_order") String sortOrder);
+    Single<ImageResponse> searchImages(@Query("phrase") String phrase,
+                                           @Query("fields") String fields,
+                                           @Query("sort_order") String sortOrder);
 
     @GET("images/{id}")
     Call<MetadataResponse> getImageMetadata(@Path("id") String id);

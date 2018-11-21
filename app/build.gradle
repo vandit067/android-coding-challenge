@@ -50,6 +50,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.6.0'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
 
     //view binding
     implementation "com.jakewharton:butterknife:$butterKnifeLibVersion"
@@ -58,6 +59,8 @@ dependencies {
     //dagger
     implementation "com.google.dagger:dagger:$daggerLibVersion"
     annotationProcessor "com.google.dagger:dagger-compiler:$daggerLibVersion"
+    implementation 'com.google.dagger:dagger-android-support:2.11'
+    annotationProcessor 'com.google.dagger:dagger-android-processor:2.11'
 
     //imaging
     implementation "com.squareup.picasso:picasso:$picassoLibVersion"

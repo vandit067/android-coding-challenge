@@ -4,6 +4,8 @@
 
     <string name="getty_base_url">https://us-central1-stashandroidchallenge.cloudfunctions.net/api/</string>
     <string name="getty_api_key">ec16cba6389c2941c8389329fc8386bd</string>
+    <!-- use below key -->
+    <!--<string name="getty_api_key">1a85473e929dd951a418907459794928</string>-->
 
     <string name="search_hint">Search Phrase</string>
     <string name="metadata_title_format">%1$s by %2$s</string>

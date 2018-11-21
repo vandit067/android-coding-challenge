@@ -16,8 +16,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.stashinvest.stashchallenge.App;
 import com.stashinvest.stashchallenge.R;
 import com.stashinvest.stashchallenge.api.model.ImageResult;
-import com.stashinvest.stashchallenge.ui.contract.MainFragmentContract;
-import com.stashinvest.stashchallenge.ui.presenter.MainFragmentPresenterImpl;
+import com.stashinvest.stashchallenge.ui.contract.GetImagesContract;
+import com.stashinvest.stashchallenge.ui.presenter.GetImagesPresenter;
 import com.stashinvest.stashchallenge.util.SpaceItemDecoration;
 
 import java.util.List;
@@ -33,8 +33,10 @@ import butterknife.BindDimen;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import dagger.android.AndroidInjection;
+import io.reactivex.disposables.CompositeDisposable;
 
-public class MainFragment extends Fragment implements MainFragmentContract.View, TextView.OnEditorActionListener {
+public class MainFragment extends Fragment implements GetImagesContract.View, TextView.OnEditorActionListener {
 
     @BindView(R.id.fragment_main_fl_main)
     FrameLayout mFlMainView;
@@ -48,9 +50,20 @@ public class MainFragment extends Fragment implements MainFragmentContract.View,
     int space;
 
     @Inject
-    MainFragmentPresenterImpl mMainFragmentPresenter;
+    GetImagesPresenter mMainFragmentPresenter;
 
     Unbinder unbinder;
+
+//    @Inject
+//    GettyImageService mGettyImageService;
+//
+//    @Inject
+//    GettyImageFactory mGettyImageFactory;
+//
+//    @Inject
+//    ViewModelAdapter mAdapter;
+
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public static MainFragment newInstance() {
         return new MainFragment();
@@ -59,6 +72,7 @@ public class MainFragment extends Fragment implements MainFragmentContract.View,
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        AndroidInjection.inject(this);
         App.getInstance().getAppComponent().inject(this);
     }
 
@@ -70,6 +84,7 @@ public class MainFragment extends Fragment implements MainFragmentContract.View,
         searchView.setOnEditorActionListener(this);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerView.setAdapter(mMainFragmentPresenter.getAdapter());
+//        recyclerView.setAdapter(mAdapter);
         recyclerView.addItemDecoration(new SpaceItemDecoration(space, space, space, space));
         return view;
     }
@@ -109,6 +124,7 @@ public class MainFragment extends Fragment implements MainFragmentContract.View,
             return;
         }
         this.mMainFragmentPresenter.updateImages(imagesList);
+//        updateImages(imagesList);
     }
 
     @Override
@@ -118,9 +134,37 @@ public class MainFragment extends Fragment implements MainFragmentContract.View,
                 Snackbar.make(this.mFlMainView, getString(R.string.message_enter_search_text), Snackbar.LENGTH_SHORT).show();
                 return false;
             }
+//            loadData(v.getText().toString());
             mMainFragmentPresenter.loadData(v.getText().toString());
             return true;
         }
         return false;
     }
+
+//    public void loadData(@NonNull String searchText) {
+//       compositeDisposable.add(this.mGettyImageService.searchImages(searchText)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .doOnSubscribe(disposable -> showProgress())
+//                .subscribe(imageResponse -> {
+//                    hideProgress();
+//                    showData(imageResponse.getImages());
+//                }, e -> {
+//                    hideProgress();
+//                    showError(e.getMessage());
+//                }));
+//    }
+//
+//    public void updateImages(@NonNull List<ImageResult> images) {
+//        List<BaseViewModel> viewModels = new ArrayList<>();
+//        int i = 0;
+//        for (ImageResult imageResult : images) {
+//            viewModels.add(mGettyImageFactory.createGettyImageViewModel(i++, imageResult, this::onImageLongPress));
+//        }
+//        this.mAdapter.setViewModels(viewModels);
+//    }
+//
+//    private void onImageLongPress(String id, String uri) {
+//        //todo - implement new feature
+//    }
 }
