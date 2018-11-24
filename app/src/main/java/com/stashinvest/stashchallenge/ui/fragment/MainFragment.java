@@ -15,9 +15,14 @@ import android.widget.TextView;
 import com.google.android.material.snackbar.Snackbar;
 import com.stashinvest.stashchallenge.App;
 import com.stashinvest.stashchallenge.R;
+import com.stashinvest.stashchallenge.api.GettyImageService;
 import com.stashinvest.stashchallenge.api.model.ImageResult;
+import com.stashinvest.stashchallenge.ui.adapter.ViewModelAdapter;
 import com.stashinvest.stashchallenge.ui.contract.GetImagesContract;
+import com.stashinvest.stashchallenge.ui.factory.GettyImageFactory;
 import com.stashinvest.stashchallenge.ui.presenter.GetImagesPresenter;
+import com.stashinvest.stashchallenge.ui.viewmodel.BaseViewModel;
+import com.stashinvest.stashchallenge.ui.viewmodel.GettyImageViewModel;
 import com.stashinvest.stashchallenge.util.SpaceItemDecoration;
 
 import java.util.List;
@@ -33,10 +38,8 @@ import butterknife.BindDimen;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import dagger.android.AndroidInjection;
-import io.reactivex.disposables.CompositeDisposable;
 
-public class MainFragment extends Fragment implements GetImagesContract.View, TextView.OnEditorActionListener {
+public class MainFragment extends Fragment implements GetImagesContract.View, TextView.OnEditorActionListener, GettyImageViewModel.Listener {
 
     @BindView(R.id.fragment_main_fl_main)
     FrameLayout mFlMainView;
@@ -49,21 +52,21 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
     @BindDimen(R.dimen.image_space)
     int space;
 
-    @Inject
+//    @Inject
     GetImagesPresenter mMainFragmentPresenter;
 
     Unbinder unbinder;
 
-//    @Inject
-//    GettyImageService mGettyImageService;
-//
-//    @Inject
-//    GettyImageFactory mGettyImageFactory;
-//
-//    @Inject
-//    ViewModelAdapter mAdapter;
+    @Inject
+    GettyImageService mGettyImageService;
 
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    @Inject
+    GettyImageFactory mGettyImageFactory;
+
+    @Inject
+    ViewModelAdapter mAdapter;
+
+//    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public static MainFragment newInstance() {
         return new MainFragment();
@@ -74,6 +77,7 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
         super.onCreate(savedInstanceState);
 //        AndroidInjection.inject(this);
         App.getInstance().getAppComponent().inject(this);
+        this.mMainFragmentPresenter = new GetImagesPresenter(this, this.mGettyImageService, this.mGettyImageFactory);
     }
 
     @Nullable
@@ -83,8 +87,8 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
         unbinder = ButterKnife.bind(this, view);
         searchView.setOnEditorActionListener(this);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
-        recyclerView.setAdapter(mMainFragmentPresenter.getAdapter());
-//        recyclerView.setAdapter(mAdapter);
+//        recyclerView.setAdapter(mMainFragmentPresenter.getAdapter());
+        recyclerView.setAdapter(mAdapter);
         recyclerView.addItemDecoration(new SpaceItemDecoration(space, space, space, space));
         return view;
     }
@@ -123,7 +127,8 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
             Snackbar.make(this.mFlMainView, getString(R.string.message_no_data_available), Snackbar.LENGTH_SHORT).show();
             return;
         }
-        this.mMainFragmentPresenter.updateImages(imagesList);
+        List<BaseViewModel> viewModels = this.mMainFragmentPresenter.updateImages(imagesList, this);
+        this.mAdapter.setViewModels(viewModels);
 //        updateImages(imagesList);
     }
 
@@ -141,30 +146,38 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
         return false;
     }
 
-//    public void loadData(@NonNull String searchText) {
-//       compositeDisposable.add(this.mGettyImageService.searchImages(searchText)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .doOnSubscribe(disposable -> showProgress())
-//                .subscribe(imageResponse -> {
-//                    hideProgress();
-//                    showData(imageResponse.getImages());
-//                }, e -> {
-//                    hideProgress();
-//                    showError(e.getMessage());
-//                }));
-//    }
-//
-//    public void updateImages(@NonNull List<ImageResult> images) {
-//        List<BaseViewModel> viewModels = new ArrayList<>();
-//        int i = 0;
-//        for (ImageResult imageResult : images) {
-//            viewModels.add(mGettyImageFactory.createGettyImageViewModel(i++, imageResult, this::onImageLongPress));
-//        }
-//        this.mAdapter.setViewModels(viewModels);
-//    }
-//
-//    private void onImageLongPress(String id, String uri) {
-//        //todo - implement new feature
-//    }
+    /*public void loadData(@NonNull String searchText) {
+       compositeDisposable.add(this.mGettyImageService.searchImages(searchText)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> showProgress())
+                .subscribe(imageResponse -> {
+                    hideProgress();
+                    showData(imageResponse.getImages());
+                }, e -> {
+                    hideProgress();
+                    showError(e.getMessage());
+                }));
+    }*/
+
+    /*private void updateImages(@NonNull List<ImageResult> images) {
+        List<BaseViewModel> viewModels = new ArrayList<>();
+        int i = 0;
+        for (ImageResult imageResult : images) {
+            viewModels.add(mGettyImageFactory.createGettyImageViewModel(i++, imageResult, this));
+        }
+        this.mAdapter.setViewModels(viewModels);
+    }*/
+
+    @Override
+    public void onImageLongPress(String id, String uri) {
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.mMainFragmentPresenter.onDestroy();
+        this.mMainFragmentPresenter = null;
+    }
 }

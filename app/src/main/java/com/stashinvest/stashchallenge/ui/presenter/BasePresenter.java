@@ -31,7 +31,7 @@ public abstract class BasePresenter<V> {
      * Contains common cleanup actions needed for all presenters, if any.
      * Subclasses may override this.
      */
-    public void onStop(){
+    public void onDestroy(){
         compositeDisposable.clear();
     }
 
