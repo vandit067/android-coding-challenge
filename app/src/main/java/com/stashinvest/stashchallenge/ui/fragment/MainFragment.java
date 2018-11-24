@@ -1,6 +1,5 @@
 package com.stashinvest.stashchallenge.ui.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -70,8 +69,6 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
     @Inject
     ViewModelAdapter mAdapter;
 
-//    private CompositeDisposable compositeDisposable = new CompositeDisposable();
-
     private Context mContext;
 
     public static MainFragment newInstance() {
@@ -87,7 +84,6 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        AndroidInjection.inject(this);
         App.getInstance().getAppComponent().inject(this);
         this.mMainFragmentPresenter = new GetImagesPresenter(this, this.mGettyImageService, this.mGettyImageFactory);
     }
@@ -99,7 +95,6 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
         unbinder = ButterKnife.bind(this, view);
         searchView.setOnEditorActionListener(this);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
-//        recyclerView.setAdapter(mMainFragmentPresenter.getAdapter());
         recyclerView.setAdapter(mAdapter);
         recyclerView.addItemDecoration(new SpaceItemDecoration(space, space, space, space));
         return view;
@@ -122,11 +117,6 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
     }
 
     @Override
-    public void showComplete() {
-
-    }
-
-    @Override
     public void showError(@NonNull String message) {
         this.hideProgress();
         Snackbar.make(this.mFlMainView, message, Snackbar.LENGTH_SHORT).show();
@@ -141,7 +131,6 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
         }
         List<BaseViewModel> viewModels = this.mMainFragmentPresenter.updateImages(imagesList, this);
         this.mAdapter.setViewModels(viewModels);
-//        updateImages(imagesList);
     }
 
     @Override
@@ -151,35 +140,11 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
                 Snackbar.make(this.mFlMainView, getString(R.string.message_enter_search_text), Snackbar.LENGTH_SHORT).show();
                 return false;
             }
-//            loadData(v.getText().toString());
             mMainFragmentPresenter.loadData(v.getText().toString());
             return true;
         }
         return false;
     }
-
-    /*public void loadData(@NonNull String searchText) {
-       compositeDisposable.add(this.mGettyImageService.searchImages(searchText)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> showProgress())
-                .subscribe(imageResponse -> {
-                    hideProgress();
-                    showData(imageResponse.getImages());
-                }, e -> {
-                    hideProgress();
-                    showError(e.getMessage());
-                }));
-    }*/
-
-    /*private void updateImages(@NonNull List<ImageResult> images) {
-        List<BaseViewModel> viewModels = new ArrayList<>();
-        int i = 0;
-        for (ImageResult imageResult : images) {
-            viewModels.add(mGettyImageFactory.createGettyImageViewModel(i++, imageResult, this));
-        }
-        this.mAdapter.setViewModels(viewModels);
-    }*/
 
     @Override
     public void onImageLongPress(String id, String uri) {

@@ -13,8 +13,6 @@ public interface GetImagesContract {
 
         void hideProgress();
 
-        void showComplete();
-
         void showError(@NonNull String message);
 
         void showData(@NonNull List<ImageResult> imagesList);

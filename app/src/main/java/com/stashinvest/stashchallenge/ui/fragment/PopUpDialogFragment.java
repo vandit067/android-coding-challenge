@@ -1,8 +1,8 @@
 package com.stashinvest.stashchallenge.ui.fragment;
 
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,14 +14,16 @@ import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Picasso;
+import com.stashinvest.stashchallenge.App;
 import com.stashinvest.stashchallenge.R;
+import com.stashinvest.stashchallenge.api.GettyImageService;
 import com.stashinvest.stashchallenge.api.model.ImageDetailModel;
 import com.stashinvest.stashchallenge.api.model.ImageResult;
 import com.stashinvest.stashchallenge.ui.contract.SimilarImagesContract;
 import com.stashinvest.stashchallenge.ui.presenter.SimilarImagesPresenter;
 import com.stashinvest.stashchallenge.util.UiUtils;
 
-import java.util.List;
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -59,6 +61,9 @@ public class PopUpDialogFragment extends DialogFragment implements SimilarImages
 
     private Context mContext;
 
+    @Inject
+    GettyImageService mGettyImageService;
+
 
     public static PopUpDialogFragment newInstance(@NonNull String selectedImageId, @NonNull String selectedImageUri) {
         Bundle bundle = new Bundle();
@@ -78,7 +83,8 @@ public class PopUpDialogFragment extends DialogFragment implements SimilarImages
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.mSimilarImagesPresenter = new SimilarImagesPresenter(this);
+        App.getInstance().getAppComponent().inject(this);
+        this.mSimilarImagesPresenter = new SimilarImagesPresenter(this, this.mGettyImageService);
         if (getArguments() == null) {
             dismiss();
             return;
@@ -99,6 +105,7 @@ public class PopUpDialogFragment extends DialogFragment implements SimilarImages
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getDialog().setTitle("Similar Images");
+        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         // Initiate call to retrieve similar images
         this.mSimilarImagesPresenter.getImageMetaDataWithSimilarImages(this.mContext);
     }

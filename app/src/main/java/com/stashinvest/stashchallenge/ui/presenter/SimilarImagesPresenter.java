@@ -35,10 +35,10 @@ public class SimilarImagesPresenter extends BasePresenter<SimilarImagesContract.
 
     private String mSelectedImageId;
 
-    public SimilarImagesPresenter(SimilarImagesContract.View view) {
+    public SimilarImagesPresenter(SimilarImagesContract.View view, GettyImageService gettyImageService) {
         super(view);
         this.mAppRxSchedulers = new AppRxSchedulers();
-        this.mGettyImageService = new GettyImageService();
+        this.mGettyImageService = gettyImageService;
     }
 
     public String getSelectedImageUri() {
