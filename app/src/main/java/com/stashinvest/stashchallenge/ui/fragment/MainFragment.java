@@ -1,5 +1,7 @@
 package com.stashinvest.stashchallenge.ui.fragment;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -17,6 +19,7 @@ import com.stashinvest.stashchallenge.App;
 import com.stashinvest.stashchallenge.R;
 import com.stashinvest.stashchallenge.api.GettyImageService;
 import com.stashinvest.stashchallenge.api.model.ImageResult;
+import com.stashinvest.stashchallenge.ui.activity.MainActivity;
 import com.stashinvest.stashchallenge.ui.adapter.ViewModelAdapter;
 import com.stashinvest.stashchallenge.ui.contract.GetImagesContract;
 import com.stashinvest.stashchallenge.ui.factory.GettyImageFactory;
@@ -32,6 +35,7 @@ import javax.inject.Inject;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindDimen;
@@ -68,8 +72,16 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
 
 //    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
+    private Context mContext;
+
     public static MainFragment newInstance() {
         return new MainFragment();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.mContext = context;
     }
 
     @Override
@@ -171,7 +183,9 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
 
     @Override
     public void onImageLongPress(String id, String uri) {
-
+        FragmentManager fragmentManager = ((MainActivity)this.mContext).getSupportFragmentManager();
+        PopUpDialogFragment popUpDialogFragment = PopUpDialogFragment.newInstance(id, uri);
+        popUpDialogFragment.show(fragmentManager, PopUpDialogFragment.class.getSimpleName());
     }
 
     @Override
@@ -179,5 +193,11 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
         super.onDestroy();
         this.mMainFragmentPresenter.onDestroy();
         this.mMainFragmentPresenter = null;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        this.mContext = null;
     }
 }

@@ -1,5 +1,6 @@
 package com.stashinvest.stashchallenge.ui.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Picasso;
 import com.stashinvest.stashchallenge.R;
+import com.stashinvest.stashchallenge.api.model.ImageDetailModel;
 import com.stashinvest.stashchallenge.api.model.ImageResult;
 import com.stashinvest.stashchallenge.ui.contract.SimilarImagesContract;
 import com.stashinvest.stashchallenge.ui.presenter.SimilarImagesPresenter;
@@ -40,6 +42,8 @@ public class PopUpDialogFragment extends DialogFragment implements SimilarImages
 
     @BindView(R.id.title_view)
     TextView mTvTitle;
+    @BindView(R.id.fragment_dialog_tv_artist)
+    TextView mTvArtist;
 
     @BindView(R.id.fragment_dialog_popup_progressbar)
     ProgressBar mProgressBar;
@@ -50,25 +54,37 @@ public class PopUpDialogFragment extends DialogFragment implements SimilarImages
 
     private SimilarImagesPresenter mSimilarImagesPresenter;
 
-    private static String KEY_SELECTED_IMAGE_RESULT_OBJECT = "SelectedImageResultObject";
+    private static String KEY_SELECTED_IMAGE_ID = "SelectedImageId";
+    private static String KEY_SELECTED_IMAGE_URI = "SelectedImageUri";
+
+    private Context mContext;
 
 
-    public static PopUpDialogFragment newInstance(@NonNull ImageResult selectedImageresult) {
+    public static PopUpDialogFragment newInstance(@NonNull String selectedImageId, @NonNull String selectedImageUri) {
         Bundle bundle = new Bundle();
         PopUpDialogFragment popUpDialogFragment = new PopUpDialogFragment();
-        bundle.putParcelable(KEY_SELECTED_IMAGE_RESULT_OBJECT, selectedImageresult);
-        return new PopUpDialogFragment();
+        bundle.putString(KEY_SELECTED_IMAGE_ID, selectedImageId);
+        bundle.putString(KEY_SELECTED_IMAGE_URI, selectedImageUri);
+        popUpDialogFragment.setArguments(bundle);
+        return popUpDialogFragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.mContext = context;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.mSimilarImagesPresenter = new SimilarImagesPresenter(this);
-        if (getArguments() == null || getArguments().getParcelable(KEY_SELECTED_IMAGE_RESULT_OBJECT) == null) {
+        if (getArguments() == null) {
             dismiss();
             return;
         }
-        this.mSimilarImagesPresenter.setSelectedImageResult(getArguments().getParcelable(KEY_SELECTED_IMAGE_RESULT_OBJECT));
+        this.mSimilarImagesPresenter.setSelectedImageUri(getArguments().getString(KEY_SELECTED_IMAGE_URI));
+        this.mSimilarImagesPresenter.setmSelectedImageId(getArguments().getString(KEY_SELECTED_IMAGE_ID));
     }
 
     @Nullable
@@ -84,7 +100,7 @@ public class PopUpDialogFragment extends DialogFragment implements SimilarImages
         super.onViewCreated(view, savedInstanceState);
         getDialog().setTitle("Similar Images");
         // Initiate call to retrieve similar images
-        this.mSimilarImagesPresenter.getSimilarImagesData();
+        this.mSimilarImagesPresenter.getImageMetaDataWithSimilarImages(this.mContext);
     }
 
     @Override
@@ -107,14 +123,19 @@ public class PopUpDialogFragment extends DialogFragment implements SimilarImages
     }
 
     @Override
-    public void showData(@NonNull List<ImageResult> similarImagesList) {
-        Picasso.with(getContext()).load(this.mSimilarImagesPresenter.getSelectedImageResult().getThumbUri()).into(this.mIvSelectedImage);
-        this.mTvTitle.setText(this.mSimilarImagesPresenter.getSelectedImageResult().getTitle());
-        if (similarImagesList.isEmpty()){
+    public void showData(@NonNull ImageDetailModel imageDetailModel) {
+        this.hideProgress();
+        Picasso.with(getContext()).load(imageDetailModel.getSelectedImageUri()).into(this.mIvSelectedImage);
+        if(imageDetailModel.getMetadataResponse() != null && imageDetailModel.getMetadataResponse().getMetadata() != null
+                && !imageDetailModel.getMetadataResponse().getMetadata().isEmpty()) {
+            this.mTvTitle.setText(imageDetailModel.getMetadataResponse().getMetadata().get(0).getTitle());
+            this.mTvArtist.setText(imageDetailModel.getMetadataResponse().getMetadata().get(0).getArtist());
+        }
+        if (imageDetailModel.getSimilarImages().isEmpty()){
             return;
         }
         int i = 1;
-        for (ImageResult imageResult: similarImagesList) {
+        for (ImageResult imageResult: imageDetailModel.getSimilarImages()) {
             Picasso.with(getContext()).load(imageResult.getThumbUri()).into((i > 2) ? this.mIvSimilarImage3 : (i == 1) ? this.mIvSimilarImage1 : this.mIvSimilarImage2);
             i++;
         }
@@ -126,5 +147,11 @@ public class PopUpDialogFragment extends DialogFragment implements SimilarImages
         super.onDestroy();
         this.mSimilarImagesPresenter.onDestroy();
         this.mSimilarImagesPresenter = null;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        this.mContext = null;
     }
 }

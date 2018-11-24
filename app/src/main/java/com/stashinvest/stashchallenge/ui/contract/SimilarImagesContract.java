@@ -1,8 +1,8 @@
 package com.stashinvest.stashchallenge.ui.contract;
 
-import com.stashinvest.stashchallenge.api.model.ImageResult;
+import android.content.Context;
 
-import java.util.List;
+import com.stashinvest.stashchallenge.api.model.ImageDetailModel;
 
 import androidx.annotation.NonNull;
 
@@ -15,10 +15,10 @@ public interface SimilarImagesContract {
 
         void showError(@NonNull String message);
 
-        void showData(@NonNull List<ImageResult> similarImagesList);
+        void showData(@NonNull ImageDetailModel imageDetailModel);
     }
 
     interface Presenter {
-        void getSimilarImagesData();
+        void getImageMetaDataWithSimilarImages(@NonNull Context context);
     }
 }

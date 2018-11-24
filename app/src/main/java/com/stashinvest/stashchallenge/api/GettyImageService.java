@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import retrofit2.Call;
 
 public class GettyImageService {
     private static final String FIELDS = "id,title,thumb";
@@ -30,7 +29,7 @@ public class GettyImageService {
     }
 
 
-    public Call<MetadataResponse> getImageMetadata(String id) {
+    public Single<MetadataResponse> getImageMetadata(String id) {
         return api.getImageMetadata(id);
     }
 
