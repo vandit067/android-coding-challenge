@@ -2,7 +2,6 @@ package com.stashinvest.stashchallenge.ui.presenter;
 
 import com.stashinvest.stashchallenge.api.GettyImageService;
 import com.stashinvest.stashchallenge.api.model.ImageResult;
-import com.stashinvest.stashchallenge.ui.adapter.ViewModelAdapter;
 import com.stashinvest.stashchallenge.ui.contract.GetImagesContract;
 import com.stashinvest.stashchallenge.ui.factory.GettyImageFactory;
 import com.stashinvest.stashchallenge.ui.viewmodel.BaseViewModel;
@@ -16,12 +15,12 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 
-public class GetImagesPresenter extends BasePresenter<GetImagesContract.View> implements GetImagesContract.Presenter{
+public class GetImagesPresenter extends BasePresenter<GetImagesContract.View> implements GetImagesContract.Presenter {
 
-//    @Inject
+    //    @Inject
     GettyImageService mGettyImageService;
 
-//    @Inject
+    //    @Inject
     GettyImageFactory mGettyImageFactory;
 
 //    @Inject

@@ -3,11 +3,8 @@ package com.stashinvest.stashchallenge.api;
 import android.content.Context;
 
 import com.stashinvest.stashchallenge.api.model.ImageResponse;
-import com.stashinvest.stashchallenge.api.model.ImageResult;
 import com.stashinvest.stashchallenge.api.model.MetadataResponse;
 import com.stashinvest.stashchallenge.util.NetworkUtils;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -37,7 +34,8 @@ public class GettyImageService {
         return api.getImageMetadata(id);
     }
 
-    public Call<ImageResponse> getSimilarImages(String id) {
+    @NonNull
+    public Single<ImageResponse> getSimilarImages(String id) {
         return api.getSimilarImages(id);
     }
 

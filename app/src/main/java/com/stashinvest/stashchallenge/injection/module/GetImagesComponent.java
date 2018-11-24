@@ -6,8 +6,9 @@ import dagger.Subcomponent;
 public interface GetImagesComponent {
 
     @Subcomponent.Builder
-    interface Builder{
+    interface Builder {
         Builder imagesModule(GetImagesViewModule getImagesViewModule);
+
         GetImagesComponent build();
     }
 }

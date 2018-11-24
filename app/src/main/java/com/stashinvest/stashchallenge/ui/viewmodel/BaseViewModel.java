@@ -1,9 +1,10 @@
 package com.stashinvest.stashchallenge.ui.viewmodel;
 
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public abstract class BaseViewModel<T extends RecyclerView.ViewHolder> {
     private final int itemResourceId;

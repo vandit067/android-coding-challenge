@@ -1,7 +1,5 @@
 package com.stashinvest.stashchallenge.ui.adapter;
 
-import androidx.collection.SparseArrayCompat;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import com.stashinvest.stashchallenge.ui.viewmodel.BaseViewModel;
@@ -11,6 +9,9 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import androidx.collection.SparseArrayCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class ViewModelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final List<BaseViewModel> viewModels;

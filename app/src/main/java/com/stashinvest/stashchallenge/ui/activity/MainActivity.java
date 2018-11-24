@@ -1,11 +1,12 @@
 package com.stashinvest.stashchallenge.ui.activity;
 
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.stashinvest.stashchallenge.App;
 import com.stashinvest.stashchallenge.R;
 import com.stashinvest.stashchallenge.ui.fragment.MainFragment;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 

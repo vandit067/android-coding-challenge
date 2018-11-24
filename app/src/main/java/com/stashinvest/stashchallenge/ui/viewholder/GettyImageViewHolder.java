@@ -1,7 +1,5 @@
 package com.stashinvest.stashchallenge.ui.viewholder;
 
-import androidx.core.view.GestureDetectorCompat;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -10,6 +8,8 @@ import com.stashinvest.stashchallenge.R;
 import com.stashinvest.stashchallenge.api.model.ImageResult;
 import com.stashinvest.stashchallenge.util.LongPressGestureDetector;
 
+import androidx.core.view.GestureDetectorCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

@@ -52,7 +52,7 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
     @BindDimen(R.dimen.image_space)
     int space;
 
-//    @Inject
+    //    @Inject
     GetImagesPresenter mMainFragmentPresenter;
 
     Unbinder unbinder;
@@ -123,7 +123,7 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
     @Override
     public void showData(@NonNull List<ImageResult> imagesList) {
         this.hideProgress();
-        if(imagesList.isEmpty()){
+        if (imagesList.isEmpty()) {
             Snackbar.make(this.mFlMainView, getString(R.string.message_no_data_available), Snackbar.LENGTH_SHORT).show();
             return;
         }
@@ -135,7 +135,7 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-            if(TextUtils.isEmpty(v.getText())){
+            if (TextUtils.isEmpty(v.getText())) {
                 Snackbar.make(this.mFlMainView, getString(R.string.message_enter_search_text), Snackbar.LENGTH_SHORT).show();
                 return false;
             }

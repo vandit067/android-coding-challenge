@@ -13,7 +13,7 @@ public class RxModule {
 
     @Provides
     @Singleton
-    RxSchedulers provideRxSchedulers(){
+    RxSchedulers provideRxSchedulers() {
         return new AppRxSchedulers();
     }
 }
