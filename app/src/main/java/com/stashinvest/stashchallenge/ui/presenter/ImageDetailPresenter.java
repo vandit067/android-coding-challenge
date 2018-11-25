@@ -63,7 +63,7 @@ public class ImageDetailPresenter extends BasePresenter<ImageDetailContract.View
         this.mMetadataResponse = metadataResponse;
     }
 
-    public void getImageMetaDataWithSimilarImages(@NonNull Context context) {
+    public void fetchAndDisplayImageMetaDataWithSimilarImages(@NonNull Context context) {
         if(TextUtils.isEmpty(this.getSelectedImageId())){
             return;
         }

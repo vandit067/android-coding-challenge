@@ -107,7 +107,7 @@ public class PopUpDialogFragment extends DialogFragment implements ImageDetailCo
         getDialog().setTitle("Similar Images");
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         // Initiate call to retrieve similar images
-        this.mImageDetailPresenter.getImageMetaDataWithSimilarImages(this.mContext);
+        this.mImageDetailPresenter.fetchAndDisplayImageMetaDataWithSimilarImages(this.mContext);
     }
 
     @Override
