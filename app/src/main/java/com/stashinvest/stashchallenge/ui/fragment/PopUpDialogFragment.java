@@ -19,8 +19,8 @@ import com.stashinvest.stashchallenge.R;
 import com.stashinvest.stashchallenge.api.GettyImageService;
 import com.stashinvest.stashchallenge.api.model.ImageDetailModel;
 import com.stashinvest.stashchallenge.api.model.ImageResult;
-import com.stashinvest.stashchallenge.ui.contract.SimilarImagesContract;
-import com.stashinvest.stashchallenge.ui.presenter.SimilarImagesPresenter;
+import com.stashinvest.stashchallenge.ui.contract.ImageDetailContract;
+import com.stashinvest.stashchallenge.ui.presenter.ImageDetailPresenter;
 import com.stashinvest.stashchallenge.util.UiUtils;
 
 import javax.inject.Inject;
@@ -31,7 +31,7 @@ import androidx.fragment.app.DialogFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PopUpDialogFragment extends DialogFragment implements SimilarImagesContract.View {
+public class PopUpDialogFragment extends DialogFragment implements ImageDetailContract.View {
 
     @BindView(R.id.image_view)
     ImageView mIvSelectedImage;
@@ -54,7 +54,7 @@ public class PopUpDialogFragment extends DialogFragment implements SimilarImages
     @BindView(R.id.fragment_dialog_popup_rl_main_view)
     RelativeLayout mRlMainView;
 
-    private SimilarImagesPresenter mSimilarImagesPresenter;
+    private ImageDetailPresenter mImageDetailPresenter;
 
     private static String KEY_SELECTED_IMAGE_ID = "SelectedImageId";
     private static String KEY_SELECTED_IMAGE_URI = "SelectedImageUri";
@@ -84,13 +84,13 @@ public class PopUpDialogFragment extends DialogFragment implements SimilarImages
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         App.getInstance().getAppComponent().inject(this);
-        this.mSimilarImagesPresenter = new SimilarImagesPresenter(this, this.mGettyImageService);
+        this.mImageDetailPresenter = new ImageDetailPresenter(this, this.mGettyImageService);
         if (getArguments() == null) {
             dismiss();
             return;
         }
-        this.mSimilarImagesPresenter.setSelectedImageUri(getArguments().getString(KEY_SELECTED_IMAGE_URI));
-        this.mSimilarImagesPresenter.setmSelectedImageId(getArguments().getString(KEY_SELECTED_IMAGE_ID));
+        this.mImageDetailPresenter.setSelectedImageUri(getArguments().getString(KEY_SELECTED_IMAGE_URI));
+        this.mImageDetailPresenter.setmSelectedImageId(getArguments().getString(KEY_SELECTED_IMAGE_ID));
     }
 
     @Nullable
@@ -107,7 +107,7 @@ public class PopUpDialogFragment extends DialogFragment implements SimilarImages
         getDialog().setTitle("Similar Images");
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         // Initiate call to retrieve similar images
-        this.mSimilarImagesPresenter.getImageMetaDataWithSimilarImages(this.mContext);
+        this.mImageDetailPresenter.getImageMetaDataWithSimilarImages(this.mContext);
     }
 
     @Override
@@ -152,8 +152,8 @@ public class PopUpDialogFragment extends DialogFragment implements SimilarImages
     @Override
     public void onDestroy() {
         super.onDestroy();
-        this.mSimilarImagesPresenter.onDestroy();
-        this.mSimilarImagesPresenter = null;
+        this.mImageDetailPresenter.onDestroy();
+        this.mImageDetailPresenter = null;
     }
 
     @Override

@@ -2,7 +2,9 @@ package com.stashinvest.stashchallenge.ui.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
 import com.stashinvest.stashchallenge.App;
 import com.stashinvest.stashchallenge.R;
 import com.stashinvest.stashchallenge.api.GettyImageService;
@@ -26,6 +29,7 @@ import com.stashinvest.stashchallenge.ui.presenter.GetImagesPresenter;
 import com.stashinvest.stashchallenge.ui.viewmodel.BaseViewModel;
 import com.stashinvest.stashchallenge.ui.viewmodel.GettyImageViewModel;
 import com.stashinvest.stashchallenge.util.SpaceItemDecoration;
+import com.stashinvest.stashchallenge.util.UiUtils;
 
 import java.util.List;
 
@@ -42,12 +46,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class MainFragment extends Fragment implements GetImagesContract.View, TextView.OnEditorActionListener, GettyImageViewModel.Listener {
+public class MainFragment extends Fragment implements GetImagesContract.View, TextView.OnEditorActionListener,TextWatcher, GettyImageViewModel.Listener {
 
     @BindView(R.id.fragment_main_fl_main)
     FrameLayout mFlMainView;
     @BindView(R.id.search_phrase)
     EditText searchView;
+    @BindView(R.id.fragment_main_til_search)
+    TextInputLayout mTilSearch;
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
     @BindView(R.id.progress_bar)
@@ -94,6 +100,7 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         unbinder = ButterKnife.bind(this, view);
         searchView.setOnEditorActionListener(this);
+        this.searchView.addTextChangedListener(this);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerView.setAdapter(mAdapter);
         recyclerView.addItemDecoration(new SpaceItemDecoration(space, space, space, space));
@@ -109,16 +116,19 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
     @Override
     public void showProgress() {
         this.mProgressBar.setVisibility(View.VISIBLE);
+        this.recyclerView.setVisibility(View.GONE);
     }
 
     @Override
     public void hideProgress() {
         this.mProgressBar.setVisibility(View.GONE);
+        this.recyclerView.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void showError(@NonNull String message) {
-        this.hideProgress();
+        this.mProgressBar.setVisibility(View.GONE);
+        this.recyclerView.setVisibility(View.GONE);
         Snackbar.make(this.mFlMainView, message, Snackbar.LENGTH_SHORT).show();
     }
 
@@ -137,9 +147,10 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
             if (TextUtils.isEmpty(v.getText())) {
-                Snackbar.make(this.mFlMainView, getString(R.string.message_enter_search_text), Snackbar.LENGTH_SHORT).show();
+                this.mTilSearch.setError(getString(R.string.message_enter_search_text));
                 return false;
             }
+            UiUtils.hideKeyBoard(v);
             mMainFragmentPresenter.loadData(v.getText().toString());
             return true;
         }
@@ -164,5 +175,25 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
     public void onDetach() {
         super.onDetach();
         this.mContext = null;
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        if (count == 0) {
+            this.recyclerView.setVisibility(View.GONE);
+            this.mProgressBar.setVisibility(View.GONE);
+            return;
+        }
+        this.mTilSearch.setError("");
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
     }
 }

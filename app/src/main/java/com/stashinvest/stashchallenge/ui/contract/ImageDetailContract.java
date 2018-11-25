@@ -6,7 +6,7 @@ import com.stashinvest.stashchallenge.api.model.ImageDetailModel;
 
 import androidx.annotation.NonNull;
 
-public interface SimilarImagesContract {
+public interface ImageDetailContract {
 
     interface View {
         void showProgress();

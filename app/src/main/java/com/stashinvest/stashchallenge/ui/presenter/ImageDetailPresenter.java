@@ -7,23 +7,21 @@ import com.stashinvest.stashchallenge.R;
 import com.stashinvest.stashchallenge.api.GettyImageService;
 import com.stashinvest.stashchallenge.api.model.ImageDetailModel;
 import com.stashinvest.stashchallenge.api.model.ImageResponse;
-import com.stashinvest.stashchallenge.api.model.ImageResult;
 import com.stashinvest.stashchallenge.api.model.MetadataResponse;
-import com.stashinvest.stashchallenge.ui.contract.SimilarImagesContract;
+import com.stashinvest.stashchallenge.ui.contract.ImageDetailContract;
 import com.stashinvest.stashchallenge.util.rx.AppRxSchedulers;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import retrofit2.HttpException;
 
 /**
  * Business logic related to {@link com.stashinvest.stashchallenge.ui.fragment.PopUpDialogFragment}
  */
-public class SimilarImagesPresenter extends BasePresenter<SimilarImagesContract.View> implements SimilarImagesContract.Presenter {
+public class ImageDetailPresenter extends BasePresenter<ImageDetailContract.View> implements ImageDetailContract.Presenter {
 
     private AppRxSchedulers mAppRxSchedulers;
 
@@ -35,7 +33,7 @@ public class SimilarImagesPresenter extends BasePresenter<SimilarImagesContract.
 
     private String mSelectedImageId;
 
-    public SimilarImagesPresenter(SimilarImagesContract.View view, GettyImageService gettyImageService) {
+    public ImageDetailPresenter(ImageDetailContract.View view, GettyImageService gettyImageService) {
         super(view);
         this.mAppRxSchedulers = new AppRxSchedulers();
         this.mGettyImageService = gettyImageService;
