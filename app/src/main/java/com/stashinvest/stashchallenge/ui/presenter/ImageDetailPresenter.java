@@ -63,22 +63,21 @@ public class ImageDetailPresenter extends BasePresenter<ImageDetailContract.View
         this.mMetadataResponse = metadataResponse;
     }
 
-    @Override
     public void getImageMetaDataWithSimilarImages(@NonNull Context context) {
         if(TextUtils.isEmpty(this.getSelectedImageId())){
             return;
         }
-        addDisposable(this.mGettyImageService.getImageMetadata(this.getSelectedImageId())
+        addDisposable(this.getImageMetaData(this.getSelectedImageId())
                 .doOnSubscribe(disposable -> view.showProgress())
                 .subscribeOn(this.mAppRxSchedulers.io())
                 .flatMap((Function<MetadataResponse, SingleSource<ImageResponse>>) metadataResponse -> {
                     setMetadataResponse(metadataResponse);
-                    return mGettyImageService.getSimilarImages(getSelectedImageId());
+                    return this.getSimilarImages(this.getSelectedImageId());
                 })
                 .subscribeOn(this.mAppRxSchedulers.runOnBackground())
                 .flatMap((Function<ImageResponse, SingleSource<ImageDetailModel>>)
-                        imageResponse -> Single.just(new ImageDetailModel(getMetadataResponse(),
-                                getSelectedImageUri(), imageResponse.getImages())))
+                        imageResponse -> this.getImageDetailModel(getMetadataResponse(), imageResponse,
+                                getSelectedImageUri()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(imageDetailModel -> {
                     if(imageDetailModel == null){
@@ -87,11 +86,23 @@ public class ImageDetailPresenter extends BasePresenter<ImageDetailContract.View
                     }
                     view.showData(imageDetailModel);
                 }, e -> view.showError(((HttpException) e).response().raw().message())));
-//        addDisposable(this.mGettyImageService.getSimilarImages(this.getSelectedImageResult().getId())
-//                .doOnSubscribe(disposable -> view.showProgress())
-//                .subscribeOn(this.mAppRxSchedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(imageResponse -> view.showData(imageResponse.getImages()),
-//                        e -> view.showError(((HttpException) e).response().raw().message())));
+    }
+
+    @Override
+    public Single<MetadataResponse> getImageMetaData(@NonNull String id){
+        return this.mGettyImageService.getImageMetadata(id);
+    }
+
+    @Override
+    public Single<ImageResponse> getSimilarImages(@NonNull String id){
+        return mGettyImageService.getSimilarImages(id);
+    }
+
+    @Override
+    public Single<ImageDetailModel> getImageDetailModel(@NonNull MetadataResponse metadataResponse,
+                                                        @NonNull ImageResponse imageResponse,
+                                                        @NonNull String imageUri){
+        return Single.just(new ImageDetailModel(metadataResponse,
+                imageUri, imageResponse.getImages()));
     }
 }
