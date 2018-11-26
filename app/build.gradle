@@ -60,7 +60,7 @@ dependencies {
     implementation "com.google.dagger:dagger:$daggerLibVersion"
     annotationProcessor "com.google.dagger:dagger-compiler:$daggerLibVersion"
     implementation 'com.google.dagger:dagger-android-support:2.11'
-    annotationProcessor 'com.google.dagger:dagger-android-processor:2.11'
+    annotationProcessor 'com.google.dagger:dagger-android-processor:2.16'
 
     //imaging
     implementation "com.squareup.picasso:picasso:$picassoLibVersion"
