@@ -17,10 +17,10 @@ import androidx.annotation.NonNull;
 
 public class GetImagesPresenter extends BasePresenter<GetImagesContract.View> implements GetImagesContract.Presenter {
 
-    //    @Inject
+//    @Inject
     GettyImageService mGettyImageService;
 
-    //    @Inject
+//    @Inject
     GettyImageFactory mGettyImageFactory;
 
 //    @Inject
@@ -29,12 +29,18 @@ public class GetImagesPresenter extends BasePresenter<GetImagesContract.View> im
     private final AppRxSchedulers appRxSchedulers;
 
     @Inject
+    public GetImagesPresenter(GetImagesContract.View view) {
+        super(view);
+        appRxSchedulers = new AppRxSchedulers();
+    }
+
+   /* @Inject
     public GetImagesPresenter(GetImagesContract.View view, @NonNull GettyImageService gettyImageService, @NonNull GettyImageFactory mGettyImageFactory) {
         super(view);
         appRxSchedulers = new AppRxSchedulers();
         this.mGettyImageService = gettyImageService;
         this.mGettyImageFactory = mGettyImageFactory;
-    }
+    }*/
 
 //    public ViewModelAdapter getAdapter() {
 //        return this.mAdapter;

@@ -9,7 +9,7 @@ import io.reactivex.Observable;
 
 public class NetworkUtils {
 
-    private static boolean isNetworkAvailable(@NonNull Context context) {
+    public static boolean isNetworkAvailable(@NonNull Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();

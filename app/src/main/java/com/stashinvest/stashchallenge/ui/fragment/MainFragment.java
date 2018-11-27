@@ -17,27 +17,27 @@ import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
-import com.stashinvest.stashchallenge.App;
 import com.stashinvest.stashchallenge.R;
-import com.stashinvest.stashchallenge.api.GettyImageService;
 import com.stashinvest.stashchallenge.api.model.ImageResult;
+import com.stashinvest.stashchallenge.base.BaseFragment;
+import com.stashinvest.stashchallenge.injection.component.ActivityComponent;
 import com.stashinvest.stashchallenge.ui.activity.MainActivity;
 import com.stashinvest.stashchallenge.ui.adapter.ViewModelAdapter;
-import com.stashinvest.stashchallenge.ui.contract.GetImagesContract;
 import com.stashinvest.stashchallenge.ui.factory.GettyImageFactory;
-import com.stashinvest.stashchallenge.ui.presenter.GetImagesPresenter;
+import com.stashinvest.stashchallenge.ui.screen.images.ImagePresenter;
+import com.stashinvest.stashchallenge.ui.screen.images.ImagesMvpView;
 import com.stashinvest.stashchallenge.ui.viewmodel.BaseViewModel;
 import com.stashinvest.stashchallenge.ui.viewmodel.GettyImageViewModel;
 import com.stashinvest.stashchallenge.util.SpaceItemDecoration;
 import com.stashinvest.stashchallenge.util.UiUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,7 +46,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class MainFragment extends Fragment implements GetImagesContract.View, TextView.OnEditorActionListener,TextWatcher, GettyImageViewModel.Listener {
+public class MainFragment extends BaseFragment implements ImagesMvpView, TextView.OnEditorActionListener,TextWatcher, GettyImageViewModel.Listener {
 
     @BindView(R.id.fragment_main_fl_main)
     FrameLayout mFlMainView;
@@ -61,13 +61,8 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
     @BindDimen(R.dimen.image_space)
     int space;
 
-    //    @Inject
-    GetImagesPresenter mMainFragmentPresenter;
-
-    Unbinder unbinder;
-
     @Inject
-    GettyImageService mGettyImageService;
+    ImagePresenter<ImagesMvpView> mImagePresenter;
 
     @Inject
     GettyImageFactory mGettyImageFactory;
@@ -90,27 +85,36 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        App.getInstance().getAppComponent().inject(this);
-        this.mMainFragmentPresenter = new GetImagesPresenter(this, this.mGettyImageService, this.mGettyImageFactory);
+//        App.getInstance().getAppComponent().inject(this);
+//        this.mMainFragmentPresenter = new GetImagesPresenter(this);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
-        unbinder = ButterKnife.bind(this, view);
+        ActivityComponent activityComponent = getActivityComponent();
+        if(activityComponent != null){
+            setUnBinder(ButterKnife.bind(this, view));
+            activityComponent.inject(this);
+            mImagePresenter.onAttach(this);
+        }
+        return view;
+    }
+
+    @Override
+    protected void setUp(View view) {
         searchView.setOnEditorActionListener(this);
         this.searchView.addTextChangedListener(this);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerView.setAdapter(mAdapter);
         recyclerView.addItemDecoration(new SpaceItemDecoration(space, space, space, space));
-        return view;
     }
 
     @Override
     public void onDestroyView() {
+        mImagePresenter.onDetach();
         super.onDestroyView();
-        unbinder.unbind();
     }
 
     @Override
@@ -139,8 +143,18 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
             Snackbar.make(this.mFlMainView, getString(R.string.message_no_data_available), Snackbar.LENGTH_SHORT).show();
             return;
         }
-        List<BaseViewModel> viewModels = this.mMainFragmentPresenter.updateImages(imagesList, this);
+//        List<BaseViewModel> viewModels = this.mMainFragmentPresenter.updateImages(imagesList, this);
+        List<BaseViewModel> viewModels = new ArrayList<>();
+        int i = 0;
+        for (ImageResult imageResult : imagesList) {
+            viewModels.add(mGettyImageFactory.createGettyImageViewModel(i++, imageResult, this));
+        }
         this.mAdapter.setViewModels(viewModels);
+    }
+
+    @Override
+    public void openPopUpDialogFragment() {
+
     }
 
     @Override
@@ -151,7 +165,7 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
                 return false;
             }
             UiUtils.hideKeyBoard(v);
-            mMainFragmentPresenter.loadData(v.getText().toString());
+            mImagePresenter.loadData(v.getText().toString());
             return true;
         }
         return false;
@@ -164,17 +178,11 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
         popUpDialogFragment.show(fragmentManager, PopUpDialogFragment.class.getSimpleName());
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        this.mMainFragmentPresenter.onDestroy();
-        this.mMainFragmentPresenter = null;
-    }
 
     @Override
     public void onDetach() {
+        mImagePresenter.onDetach();
         super.onDetach();
-        this.mContext = null;
     }
 
     @Override
