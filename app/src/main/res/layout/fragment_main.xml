@@ -28,6 +28,8 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/search_hint"
                     android:imeOptions="actionSearch"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:inputType="text"
                     android:maxLines="1" />
 

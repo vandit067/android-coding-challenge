@@ -101,6 +101,7 @@ public class MainFragment extends Fragment implements GetImagesContract.View, Te
         unbinder = ButterKnife.bind(this, view);
         searchView.setOnEditorActionListener(this);
         this.searchView.addTextChangedListener(this);
+        UiUtils.showKeyBoard(this.searchView);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerView.setAdapter(mAdapter);
         recyclerView.addItemDecoration(new SpaceItemDecoration(space, space, space, space));
