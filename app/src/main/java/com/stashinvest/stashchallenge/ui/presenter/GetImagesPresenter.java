@@ -17,14 +17,9 @@ import androidx.annotation.NonNull;
 
 public class GetImagesPresenter extends BasePresenter<GetImagesContract.View> implements GetImagesContract.Presenter {
 
-    //    @Inject
     GettyImageService mGettyImageService;
 
-    //    @Inject
     GettyImageFactory mGettyImageFactory;
-
-//    @Inject
-//    ViewModelAdapter mAdapter;
 
     private final AppRxSchedulers appRxSchedulers;
 
@@ -35,10 +30,6 @@ public class GetImagesPresenter extends BasePresenter<GetImagesContract.View> im
         this.mGettyImageService = gettyImageService;
         this.mGettyImageFactory = mGettyImageFactory;
     }
-
-//    public ViewModelAdapter getAdapter() {
-//        return this.mAdapter;
-//    }
 
     @Override
     public void loadData(@NonNull String searchText) {
@@ -64,7 +55,4 @@ public class GetImagesPresenter extends BasePresenter<GetImagesContract.View> im
         return viewModels;
     }
 
-    /*private void onImageLongPress(String id, String uri) {
-        //todo - implement new feature
-    }*/
 }

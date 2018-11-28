@@ -5,13 +5,6 @@ import io.reactivex.disposables.Disposable;
 
 public abstract class BasePresenter<V> {
 
-    /*public enum RequestState{
-        IDLE,
-        LOADING,
-        COMPLETE,
-        ERROR
-    }*/
-
     protected final V view;
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
